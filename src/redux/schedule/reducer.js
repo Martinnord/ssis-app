@@ -5,7 +5,7 @@ import {
 } from './types';
 
 const INITIAL_STATE = {
-  currentClass: null,
+  classes: null,
   fetching: false,
   error: ''
 };
@@ -16,12 +16,25 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, fetching: true };
     case FETCH_CURRENT_CLASS_SUCCESS:
       let currentClass;
-      if (Object.keys(action.class).length === 0) {
-        currentClass = null;
-      } else {
-        currentClass = action.class;
+      let upcomingClass;
+      if (Object.keys(action.classes).length > 1) {
+        if (Object.keys(action.classes.currentClass).length === 0) {
+          currentClass = null;
+        } else {
+          currentClass = action.classes.currentClass;
+        }
+        if (Object.keys(action.classes.upcomingClass).length === 0) {
+          upcomingClass = null;
+        } else {
+          upcomingClass = action.classes.upcomingClass;
+        }
       }
-      return { ...state, currentClass, fetching: false, error: '' };
+      return {
+        ...state,
+        classes: { currentClass, upcomingClass },
+        fetching: false,
+        error: ''
+      };
     case FETCH_CURRENT_CLASS_FAIL:
       return { ...state, error: action.error, fetching: false };
     default:

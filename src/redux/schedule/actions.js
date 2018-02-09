@@ -6,7 +6,7 @@ import {
   FETCH_CURRENT_CLASS_FAIL
 } from './types';
 
-export const getCurrentClass = () => async (dispatch, getState) => {
+export const getClasses = () => async (dispatch, getState) => {
   dispatch({ type: FETCH_CURRENT_CLASS });
   try {
     const { data } = await axios({
@@ -16,8 +16,10 @@ export const getCurrentClass = () => async (dispatch, getState) => {
         Authorization: `${getState().auth.user.token}`
       }
     });
-    dispatch({ type: FETCH_CURRENT_CLASS_SUCCESS, class: data });
+    console.log(JSON.stringify(data, undefined, 2));
+    dispatch({ type: FETCH_CURRENT_CLASS_SUCCESS, classes: data });
   } catch (err) {
+    console.log(err);
     dispatch({ type: FETCH_CURRENT_CLASS_FAIL, error: err.message });
   }
 };

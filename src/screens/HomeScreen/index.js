@@ -6,7 +6,8 @@ import axios from 'axios';
 
 import commonStyles from '../../styles/common.styles';
 import homeStyles from './home.styles';
-import { getCurrentClass } from '../../redux/schedule/actions';
+import { getClasses } from '../../redux/schedule/actions';
+import { fetchLunchMenu } from '../../redux/lunch/actions';
 
 class HomeScreen extends Component {
   static navigationOptions = {
@@ -20,13 +21,14 @@ class HomeScreen extends Component {
     };
   }
 
-  componentWillMount() {
-    this.props.getCurrentClass();
+  async componentWillMount() {
+    await this.props.fetchLunchMenu();
+    await this.props.getClasses();
     this.getLunchOfTheDay();
   }
 
   componentDidMount() {
-    setInterval(this.props.getCurrentClass, 100000);
+    setInterval(this.props.getClasses, 100000);
   }
 
   /*
@@ -87,6 +89,7 @@ class HomeScreen extends Component {
   };
 
   render() {
+    // console.log(JSON.stringify(this.props.schedule.classes, undefined, 2));
     return (
       <View style={[commonStyles.container, { backgroundColor: '#eeeeee' }]}>
         <RNText style={homeStyles.header}>
@@ -117,18 +120,36 @@ class HomeScreen extends Component {
           </View>
         </Card>
         {/* <Text>{new Date().getTimezoneOffset()}</Text> */}
-        {this.props.schedule.currentClass !== null &&
-          !this.props.schedule.fetching && (
-            <Card style={commonStyles.card}>
-              <Heading>Lektion just nu</Heading>
-              <View>
-                <Text>
-                  {this.props.schedule.currentClass.subject} i
-                  {this.props.schedule.currentClass.participants.split(',')[2]}
-                </Text>
-              </View>
-            </Card>
-          )}
+        <Card style={commonStyles.card}>
+          <Heading>Lektion just nu</Heading>
+          <View>
+            {this.props.schedule.classes !== null &&
+              !this.props.schedule.fetching && (
+                <View>
+                  {this.props.schedule.classes.currentClass !== null && (
+                    <Text>
+                      {this.props.schedule.classes.currentClass.subject} i
+                      {
+                        this.props.schedule.classes.currentClass.participants.split(
+                          ','
+                        )[2]
+                      }
+                    </Text>
+                  )}
+                  <Text>
+                    {console.log(this.props.schedule.classes.upcomingClass)}
+                    Kommande:{' '}
+                    {this.props.schedule.classes.upcomingClass.subject} i
+                    {
+                      this.props.schedule.classes.upcomingClass.participants.split(
+                        ','
+                      )[2]
+                    }
+                  </Text>
+                </View>
+              )}
+          </View>
+        </Card>
       </View>
     );
   }
@@ -143,4 +164,6 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getCurrentClass })(HomeScreen);
+export default connect(mapStateToProps, { getClasses, fetchLunchMenu })(
+  HomeScreen
+);
